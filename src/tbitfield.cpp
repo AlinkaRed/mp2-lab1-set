@@ -30,7 +30,7 @@ TBitField::TBitField(const TBitField &bf) // конструктор копиро
 TBitField::~TBitField()
 {
 }
-
+ 
 int TBitField::GetMemIndex(const int n) const // индекс Мем для бита n
 {
     if ((n < 0) || (n > (BitLen - 1))) throw - 1;
