@@ -11,8 +11,16 @@
 static const int FAKE_INT = -1;
 static TBitField FAKE_BITFIELD(1);
 
-TBitField::TBitField(int len)
+TBitField::TBitField(int _BitLen)
 {
+    if (_BitLen <= 0) throw - 1;
+    BitLen = _BitLen;
+    MemLen = _BitLen / sizeof(TELEM) + 1; //подумать над реализацией без захвата лишней памяти при делении нацело
+    pMem = new TELEM[MemLen];
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = 0;
+    }
+
 }
 
 TBitField::TBitField(const TBitField &bf) // конструктор копирования
@@ -25,12 +33,19 @@ TBitField::~TBitField()
 
 int TBitField::GetMemIndex(const int n) const // индекс Мем для бита n
 {
-    return FAKE_INT;
+    if ((n < 0) || (n > (BitLen - 1))) throw - 1;
+    int res = n / 32;
+    return res;
+    //return FAKE_INT;
 }
 
 TELEM TBitField::GetMemMask(const int n) const // битовая маска для бита n
 {
-    return FAKE_INT;
+    if ((n < 0) || (n > (BitLen - 1))) throw - 1;
+    TELEM mask = 1;
+    mask << (n % 32);
+    return mask;
+    //return FAKE_INT;
 }
 
 // доступ к битам битового поля
@@ -42,6 +57,10 @@ int TBitField::GetLength(void) const // получить длину (к-во б�
 
 void TBitField::SetBit(const int n) // установить бит
 {
+    if ((n < 0) || (n > (BitLen - 1))) throw - 1;
+    int i = GetMemIndex(n);
+    TELEM t = GetMemMask(n);
+    pMem[i] = pMem[i] | t;
 }
 
 void TBitField::ClrBit(const int n) // очистить бит
@@ -55,9 +74,20 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 // битовые операции
 
-TBitField& TBitField::operator=(const TBitField &bf) // присваивание
+TBitField& TBitField::operator=(const TBitField& field) // присваивание
 {
-    return FAKE_BITFIELD;
+    if (this == &field) return *this;
+    if (MemLen != field.MemLen) {
+        delete[] pMem;
+        pMem = new TELEM[field.MemLen];
+        MemLen = field.MemLen;
+    }
+    BitLen = field.BitLen;
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = field.pMem[i];
+        return *this;
+    }
+    //return FAKE_BITFIELD;
 }
 
 int TBitField::operator==(const TBitField &bf) const // сравнение
