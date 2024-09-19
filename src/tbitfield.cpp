@@ -3,7 +3,7 @@
 // tbitfield.cpp - Copyright (c) Гергель В.П. 07.05.2001
 //   Переработано для Microsoft Visual Studio 2008 Сысоевым А.В. (19.04.2015)
 //
-// Битовое поле привет
+// Битовое поле
 
 #include "tbitfield.h"
 
@@ -102,23 +102,20 @@ TBitField& TBitField::operator=(const TBitField& bf) // присваивание
 
 int TBitField::operator==(const TBitField& bf) const // сравнение - ?
 {
-	if (BitLen != bf.BitLen)
-		return 0;
-	for (int i = 0; i < MemLen; ++i)
+	if (BitLen != bf.BitLen) return 0;
+
+	for (int i = 0; i < MemLen - 1; ++i)
 		if (pMem[i] != bf.pMem[i]) return 0;
-	for (int i = MemLen; i < (MemLen-1)*sizeof(TELEM)*8; i++)
-		if (this->GetBit(i) != bf.GetBit(i))
-			return 0;
+
+	for (int i = (MemLen - 1) * sizeof(TELEM) * 8; i < BitLen; i++)
+		if (GetBit(i) != bf.GetBit(i)) return 0;
+
 	return 1;
 }
 
 int TBitField::operator!=(const TBitField& bf) const // сравнение
 {
-	int r = (bf == *this);
-	if (r == 0)
-		return 1;
-	else
-		return 0;
+	return !(*this == bf);
 }
 
 TBitField TBitField::operator|(const TBitField& bf) // операция побитовое "или"
@@ -169,9 +166,11 @@ TBitField TBitField::operator&(const TBitField& bf) // операция поби
 TBitField TBitField::operator~(void) // отрицание
 {
 	TBitField res(BitLen);
-	for (int i = 0; i < MemLen; ++i) {
+	for (int i = 0; i < MemLen; ++i)
 		res.pMem[i] = ~pMem[i];
-	}
+	int l = (1 << BitLen % (sizeof(TELEM) * 8)) - 1;
+	if (BitLen % (sizeof(TELEM) * 8) != 0)
+		res.pMem[MemLen - 1] &= l;
 	return res;
 }
 
