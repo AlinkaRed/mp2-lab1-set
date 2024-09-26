@@ -16,7 +16,7 @@ private:
   int MaxPower;       // максимальная мощность множества
   TBitField BitField; // битовое поле для хранения характеристического вектора
 public:
-  TSet(int mp);
+  TSet(int mp); //конструтор инициализации
   TSet(const TSet &s);       // конструктор копирования
   TSet(const TBitField &bf); // конструктор преобразования типа
   operator TBitField();      // преобразование типа к битовому полю
@@ -37,7 +37,7 @@ public:
   TSet operator* (const TSet &s);  // пересечение
   TSet operator~ (void);           // дополнение
 
-  friend istream &operator>>(istream &istr, TSet &bf);
-  friend ostream &operator<<(ostream &ostr, const TSet &bf);
+  friend istream &operator>>(istream &in, TSet &bf);
+  friend ostream &operator<<(ostream &out, const TSet &bf);
 };
 #endif

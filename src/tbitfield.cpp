@@ -104,7 +104,7 @@ int TBitField::operator==(const TBitField& bf) const // сравнение - ?
 {
 	if (BitLen != bf.BitLen) return 0;
 
-	for (int i = 0; i < MemLen - 1; ++i)
+	for (int i = 0; i < MemLen - 1; i++)
 		if (pMem[i] != bf.pMem[i]) return 0;
 
 	for (int i = (MemLen - 1) * sizeof(TELEM) * 8; i < BitLen; i++)
@@ -117,8 +117,28 @@ int TBitField::operator!=(const TBitField& bf) const // сравнение
 {
 	return !(*this == bf);
 }
+TBitField TBitField::operator|(const TBitField& bf) // операция "или"
+{
+	int len = (BitLen > bf.BitLen) ? BitLen : bf.BitLen;
+	len = std::max(BitLen, bf.BitLen);
+	TBitField result(len);
+	for (int i = 0; i < MemLen; ++i)
+		result.pMem[i] = (pMem[i] | bf.pMem[i]);
 
-TBitField TBitField::operator|(const TBitField& bf) // операция побитовое "или"
+	return result;
+}
+
+TBitField TBitField::operator&(const TBitField& bf) // операция "и"
+{
+	int len = (BitLen > bf.BitLen) ? BitLen : bf.BitLen;
+	TBitField result(len);
+	for (int i = 0; i < result.MemLen; ++i)
+		result.pMem[i] = (pMem[i] & bf.pMem[i]);
+
+	return result;
+}
+/*
+TBitField TBitField::operator|(const TBitField& bf)
 {
 	int len;
 	int len1;
@@ -145,7 +165,7 @@ TBitField TBitField::operator|(const TBitField& bf) // операция поби
 	return res;
 }
 
-TBitField TBitField::operator&(const TBitField& bf) // операция побитовое "и"
+TBitField TBitField::operator&(const TBitField& bf) 
 {
 	int len;
 	int len1;
@@ -162,7 +182,7 @@ TBitField TBitField::operator&(const TBitField& bf) // операция поби
 		res.pMem[i] = pMem[i] & bf.pMem[i];
 	return res;
 }
-
+*/
 TBitField TBitField::operator~(void) // отрицание
 {
 	TBitField res(BitLen);
